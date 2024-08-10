@@ -41,3 +41,7 @@ URL: jdbc:postgresql://db:5432/postgres
 Usuario: postgres
 Contraseña: postgres
 
+## Docker Hub : 
+
+También se dejan las imagenes publicas en docker hub por si se necesita : https://hub.docker.com/u/rkjayko2
+
