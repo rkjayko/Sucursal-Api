@@ -45,3 +45,6 @@ Contraseña: postgres
 
 También se dejan las imagenes publicas en docker hub por si se necesita : https://hub.docker.com/u/rkjayko2
 
+# AWS Ec2 : 
+
+Se deja la url donde esta funcionando para EC2 : http://52.15.76.205:8080/api/franchises/1/top-products -- Endpoint para traer los top product , en swagger esta los endpoints restantes y como utilizarlos
