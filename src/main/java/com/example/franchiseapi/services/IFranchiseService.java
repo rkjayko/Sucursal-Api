@@ -3,7 +3,6 @@ package com.example.franchiseapi.services;
 import com.example.franchiseapi.dto.FranchiseRequestDTO;
 import com.example.franchiseapi.dto.FranchiseResponseDTO;
 import com.example.franchiseapi.entity.Branch;
-import com.example.franchiseapi.entity.Franchise;
 import com.example.franchiseapi.entity.Product;
 import com.example.franchiseapi.mapper.FranchiseMapper;
 import com.example.franchiseapi.repository.BranchRepository;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -39,20 +39,27 @@ public class IFranchiseService implements FranchiseServiceInterface {
     @Override
     public FranchiseResponseDTO addFranchise(FranchiseRequestDTO franchiseRequestDTO) {
         log.info("Add new Franchise : {}", franchiseRequestDTO.getName());
+
         franchiseValidator.validateFranchiseNotExists(franchiseRequestDTO.getName());
 
-        Franchise franchise = franchiseMapper.toEntity(franchiseRequestDTO);
-        Franchise savedFranchise = franchiseRepository.save(franchise);
-        return franchiseMapper.toResponseDTO(savedFranchise);
+        return Optional.of(franchiseRequestDTO)
+                .map(franchiseMapper::toEntity)
+                .map(franchiseRepository::save)
+                .map(franchiseMapper::toResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Failed to add franchise"));
     }
 
     @Override
     public Branch addBranchToFranchise(Long franchiseId, Branch branch) {
-        log.info("Add new Brand to Franchise : {}", branch.getName());
-        Franchise franchise = franchiseValidator.validateFranchiseExists(franchiseId);
-        branchValidator.validateBranchNameUnique(branch.getName(), franchiseId);
-        branch.setFranchise(franchise);
-        return branchRepository.save(branch);
+        log.info("Add new Branch to Franchise : {}", branch.getName());
+        return Optional.of(franchiseId)
+                .map(franchiseValidator::validateFranchiseExists)
+                .map(franchise -> {
+                    branchValidator.validateBranchNameUnique(branch.getName(), franchiseId);
+                    branch.setFranchise(franchise);
+                    return branchRepository.save(branch);
+                })
+                .orElseThrow(() -> new RuntimeException("Failed to add branch to franchise"));
     }
 
     @Override
@@ -62,11 +69,14 @@ public class IFranchiseService implements FranchiseServiceInterface {
 
     @Override
     public FranchiseResponseDTO updateFranchiseName(Long id, String newName) {
-        Franchise franchise = franchiseValidator.validateFranchiseExists(id);
-        franchiseValidator.validateFranchiseNotExists(newName);
-
-        franchise.setName(newName);
-        Franchise updatedFranchise = franchiseRepository.save(franchise);
-        return franchiseMapper.toResponseDTO(updatedFranchise);
+        return Optional.of(id)
+                .map(franchiseValidator::validateFranchiseExists)
+                .map(franchise -> {
+                    franchiseValidator.validateFranchiseNotExists(newName);
+                    franchise.setName(newName);
+                    return franchiseRepository.save(franchise);
+                })
+                .map(franchiseMapper::toResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Failed to update franchise name"));
     }
 }
