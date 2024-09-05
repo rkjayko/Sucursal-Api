@@ -1,7 +1,7 @@
 package com.example.franchiseapi.services;
 
-import com.example.franchiseapi.dto.FranchiseRequestDTO;
-import com.example.franchiseapi.dto.FranchiseResponseDTO;
+import com.example.franchiseapi.dto.request.Franchise;
+import com.example.franchiseapi.dto.response.FranchiseResponse;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Product;
 import com.example.franchiseapi.mapper.FranchiseMapper;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class IFranchiseService implements FranchiseServiceInterface {
+public class FranchiseServiceImpl implements FranchiseServiceInterface {
 
     private final FranchiseRepository franchiseRepository;
     private final BranchRepository branchRepository;
@@ -27,8 +27,8 @@ public class IFranchiseService implements FranchiseServiceInterface {
     private final BranchValidator branchValidator;
 
     @Autowired
-    public IFranchiseService(FranchiseRepository franchiseRepository, BranchRepository branchRepository,
-                             FranchiseMapper franchiseMapper, FranchiseValidator franchiseValidator, BranchValidator branchValidator) {
+    public FranchiseServiceImpl(FranchiseRepository franchiseRepository, BranchRepository branchRepository,
+                                FranchiseMapper franchiseMapper, FranchiseValidator franchiseValidator, BranchValidator branchValidator) {
         this.franchiseRepository = franchiseRepository;
         this.branchRepository = branchRepository;
         this.franchiseMapper = franchiseMapper;
@@ -37,12 +37,12 @@ public class IFranchiseService implements FranchiseServiceInterface {
     }
 
     @Override
-    public FranchiseResponseDTO addFranchise(FranchiseRequestDTO franchiseRequestDTO) {
-        log.info("Add new Franchise : {}", franchiseRequestDTO.getName());
+    public FranchiseResponse addFranchise(Franchise franchise) {
+        log.info("Add new Franchise : {}", franchise.getName());
 
-        franchiseValidator.validateFranchiseNotExists(franchiseRequestDTO.getName());
+        franchiseValidator.validateFranchiseNotExists(franchise.getName());
 
-        return Optional.of(franchiseRequestDTO)
+        return Optional.of(franchise)
                 .map(franchiseMapper::toEntity)
                 .map(franchiseRepository::save)
                 .map(franchiseMapper::toResponseDTO)
@@ -68,7 +68,7 @@ public class IFranchiseService implements FranchiseServiceInterface {
     }
 
     @Override
-    public FranchiseResponseDTO updateFranchiseName(Long id, String newName) {
+    public FranchiseResponse updateFranchiseName(Long id, String newName) {
         return Optional.of(id)
                 .map(franchiseValidator::validateFranchiseExists)
                 .map(franchise -> {

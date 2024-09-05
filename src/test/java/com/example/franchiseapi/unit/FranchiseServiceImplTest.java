@@ -1,14 +1,13 @@
 package com.example.franchiseapi.unit;
 
-import com.example.franchiseapi.dto.FranchiseRequestDTO;
-import com.example.franchiseapi.dto.FranchiseResponseDTO;
+import com.example.franchiseapi.dto.response.FranchiseResponse;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Franchise;
 import com.example.franchiseapi.entity.Product;
 import com.example.franchiseapi.mapper.FranchiseMapper;
 import com.example.franchiseapi.repository.BranchRepository;
 import com.example.franchiseapi.repository.FranchiseRepository;
-import com.example.franchiseapi.services.IFranchiseService;
+import com.example.franchiseapi.services.FranchiseServiceImpl;
 import com.example.franchiseapi.util.BranchValidator;
 import com.example.franchiseapi.util.FranchiseValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class IFranchiseServiceTest {
+public class FranchiseServiceImplTest {
 
     @Mock
     private FranchiseRepository franchiseRepository;
@@ -41,7 +40,7 @@ public class IFranchiseServiceTest {
     private BranchValidator branchValidator;
 
     @InjectMocks
-    private IFranchiseService franchiseService;
+    private FranchiseServiceImpl franchiseService;
 
     @BeforeEach
     public void setUp() {
@@ -50,17 +49,17 @@ public class IFranchiseServiceTest {
 
     @Test
     public void testAddFranchise() {
-        FranchiseRequestDTO requestDTO = new FranchiseRequestDTO();
+        com.example.franchiseapi.dto.request.Franchise requestDTO = new com.example.franchiseapi.dto.request.Franchise();
         requestDTO.setName("NewFranchise");
         Franchise franchise = new Franchise();
-        FranchiseResponseDTO responseDTO = new FranchiseResponseDTO();
+        FranchiseResponse responseDTO = new FranchiseResponse();
 
         doNothing().when(franchiseValidator).validateFranchiseNotExists(requestDTO.getName());
         when(franchiseMapper.toEntity(requestDTO)).thenReturn(franchise);
         when(franchiseRepository.save(franchise)).thenReturn(franchise);
         when(franchiseMapper.toResponseDTO(franchise)).thenReturn(responseDTO);
 
-        FranchiseResponseDTO result = franchiseService.addFranchise(requestDTO);
+        FranchiseResponse result = franchiseService.addFranchise(requestDTO);
 
         assertEquals(responseDTO, result);
         verify(franchiseRepository).save(franchise);
@@ -99,14 +98,14 @@ public class IFranchiseServiceTest {
         Long franchiseId = 1L;
         String newName = "UpdatedFranchise";
         Franchise franchise = new Franchise();
-        FranchiseResponseDTO responseDTO = new FranchiseResponseDTO();
+        FranchiseResponse responseDTO = new FranchiseResponse();
 
         when(franchiseValidator.validateFranchiseExists(franchiseId)).thenReturn(franchise);
         doNothing().when(franchiseValidator).validateFranchiseNotExists(newName);
         when(franchiseRepository.save(franchise)).thenReturn(franchise);
         when(franchiseMapper.toResponseDTO(franchise)).thenReturn(responseDTO);
 
-        FranchiseResponseDTO result = franchiseService.updateFranchiseName(franchiseId, newName);
+        FranchiseResponse result = franchiseService.updateFranchiseName(franchiseId, newName);
 
         assertEquals(responseDTO, result);
         verify(franchiseRepository).save(franchise);

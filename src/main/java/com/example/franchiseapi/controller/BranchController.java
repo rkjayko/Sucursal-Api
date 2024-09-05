@@ -1,11 +1,13 @@
 package com.example.franchiseapi.controller;
 
-import com.example.franchiseapi.dto.BranchResponseDTO;
-import com.example.franchiseapi.dto.BranchUpdateDTO;
-import com.example.franchiseapi.dto.ProductRequestDTO;
-import com.example.franchiseapi.dto.ProductResponseDTO;
-import com.example.franchiseapi.services.BranchService;
-import com.example.franchiseapi.services.IProductService;
+import com.example.franchiseapi.dto.request.BranchUpdate;
+import com.example.franchiseapi.dto.request.Product;
+import com.example.franchiseapi.dto.response.BranchDTO;
+import com.example.franchiseapi.dto.response.ProductDTO;
+import com.example.franchiseapi.services.BranchServiceImpl;
+import com.example.franchiseapi.services.ProductServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,29 +15,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "Branch", description = "Branch management APIs")
 @RequestMapping("/api/branches")
 public class BranchController {
 
-    private final BranchService branchService;
-
-    private final IProductService productService;
+    private final BranchServiceImpl branchServiceImpl;
+    private final ProductServiceImpl productService;
 
     @Autowired
-    public BranchController(BranchService branchService, IProductService productService) {
-        this.branchService = branchService;
+    public BranchController(BranchServiceImpl branchServiceImpl, ProductServiceImpl productService) {
+        this.branchServiceImpl = branchServiceImpl;
         this.productService = productService;
     }
 
     @PostMapping("/{branchId}/products")
-    public ResponseEntity<ProductResponseDTO> addProductToBranch(
+    @Operation(summary = "Add a product to one branch", description = "")
+    public ResponseEntity<ProductDTO> addProductToBranch(
             @PathVariable Long branchId,
-            @Valid @RequestBody ProductRequestDTO productRequest) {
+            @Valid @RequestBody Product productRequest) {
 
-        ProductResponseDTO newProduct = productService.addProductToBranch(branchId, productRequest);
+        ProductDTO newProduct = productService.addProductToBranch(branchId, productRequest);
         return ResponseEntity.ok(newProduct);
     }
 
     @DeleteMapping("/{branchId}/products/{productId}")
+    @Operation(summary = "Delete a product to one branch", description = "")
     public ResponseEntity<String> deleteProductFromBranch(
             @PathVariable Long branchId,
             @PathVariable Long productId) {
@@ -44,12 +48,13 @@ public class BranchController {
     }
 
     @PutMapping("/{branchId}")
-    public ResponseEntity<BranchResponseDTO> updateBranchName(
+    @Operation(summary = "Update one branch with new name", description = "")
+    public ResponseEntity<BranchDTO> updateBranchName(
             @PathVariable Long branchId,
             @RequestParam Long franchiseId,
-            @RequestBody @Valid BranchUpdateDTO branchUpdateDTO) {
+            @RequestBody @Valid BranchUpdate branchUpdate) {
 
-        BranchResponseDTO updatedBranch = branchService.updateBranchName(branchId, franchiseId, branchUpdateDTO.getName());
+        BranchDTO updatedBranch = branchServiceImpl.updateBranchName(branchId, franchiseId, branchUpdate.getName());
         return new ResponseEntity<>(updatedBranch, HttpStatus.OK);
     }
 }

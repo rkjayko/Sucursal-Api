@@ -1,6 +1,6 @@
-package com.example.franchiseapi.dto;
+package com.example.franchiseapi.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Data
-public class ProductRequestDTO {
-
-    @NotBlank(message = "Name cannot be blank")
-    private String name;
+public class ProductStockUpdate {
 
     @NotNull(message = "Stock cannot be null")
+    @Min(value = 1, message = "Stock must be greater than 0")
     private Integer stock;
-
 }

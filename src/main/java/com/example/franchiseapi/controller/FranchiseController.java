@@ -1,12 +1,14 @@
 package com.example.franchiseapi.controller;
 
-import com.example.franchiseapi.dto.FranchiseRequestDTO;
-import com.example.franchiseapi.dto.FranchiseResponseDTO;
-import com.example.franchiseapi.dto.FranchiseUpdateDTO;
-import com.example.franchiseapi.dto.TopProductDTO;
+import com.example.franchiseapi.dto.request.Franchise;
+import com.example.franchiseapi.dto.request.FranchiseUpdate;
+import com.example.franchiseapi.dto.response.FranchiseResponse;
+import com.example.franchiseapi.dto.response.TopProductDTO;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Product;
-import com.example.franchiseapi.services.IFranchiseService;
+import com.example.franchiseapi.services.FranchiseServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,23 +19,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Tag(name = "Franchise", description = "Franchise management APIs")
 @RequestMapping("/api/franchises")
 public class FranchiseController {
 
-    private final IFranchiseService franchiseService;
+    private final FranchiseServiceImpl franchiseService;
 
     @Autowired
-    public FranchiseController(IFranchiseService franchiseService) {
+    public FranchiseController(FranchiseServiceImpl franchiseService) {
         this.franchiseService = franchiseService;
     }
-    
+
     @PostMapping
-    public ResponseEntity<FranchiseResponseDTO> addFranchise(@RequestBody @Valid FranchiseRequestDTO franchise) {
-        FranchiseResponseDTO newFranchise = franchiseService.addFranchise(franchise);
+    @Operation(summary = "Add a new Franchise", description = "")
+    public ResponseEntity<FranchiseResponse> addFranchise(@RequestBody @Valid Franchise franchise) {
+        FranchiseResponse newFranchise = franchiseService.addFranchise(franchise);
         return new ResponseEntity<>(newFranchise, HttpStatus.CREATED);
     }
 
     @PostMapping("/{franchiseId}/branches")
+    @Operation(summary = "Add one branch to Franchise", description = "")
     public ResponseEntity<Branch> addBranchToFranchise(
             @PathVariable Long franchiseId,
             @RequestBody @Valid Branch branch) {
@@ -43,6 +48,7 @@ public class FranchiseController {
     }
 
     @GetMapping("/{franchiseId}/top-products")
+    @Operation(summary = "Get products from a top list branch", description = "")
     public ResponseEntity<List<TopProductDTO>> getTopProductsByStockInEachBranch(@PathVariable Long franchiseId) {
         List<Product> topProducts = franchiseService.getTopProductsByStockInEachBranch(franchiseId);
         List<TopProductDTO> result = topProducts.stream()
@@ -52,11 +58,12 @@ public class FranchiseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FranchiseResponseDTO> updateFranchiseName(
+    @Operation(summary = "Update a franchise with a new name", description = "")
+    public ResponseEntity<FranchiseResponse> updateFranchiseName(
             @PathVariable Long id,
-            @RequestBody @Valid FranchiseUpdateDTO franchiseUpdateDTO) {
+            @RequestBody @Valid FranchiseUpdate franchiseUpdate) {
 
-        FranchiseResponseDTO updatedFranchise = franchiseService.updateFranchiseName(id, franchiseUpdateDTO.getName());
+        FranchiseResponse updatedFranchise = franchiseService.updateFranchiseName(id, franchiseUpdate.getName());
         return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
     }
 }

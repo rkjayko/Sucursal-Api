@@ -1,11 +1,11 @@
 package com.example.franchiseapi.unit;
 
-import com.example.franchiseapi.dto.BranchResponseDTO;
+import com.example.franchiseapi.dto.response.BranchDTO;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Franchise;
 import com.example.franchiseapi.exception.CustomException;
 import com.example.franchiseapi.repository.BranchRepository;
-import com.example.franchiseapi.services.BranchService;
+import com.example.franchiseapi.services.BranchServiceImpl;
 import com.example.franchiseapi.util.BranchValidator;
 import com.example.franchiseapi.util.FranchiseValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class BranchServiceTest {
+public class BranchServiceImplTest {
 
     @Mock
     private BranchRepository branchRepository;
@@ -30,7 +30,7 @@ public class BranchServiceTest {
     private FranchiseValidator franchiseValidator;
 
     @InjectMocks
-    private BranchService branchService;
+    private BranchServiceImpl branchServiceImpl;
 
     @BeforeEach
     public void setUp() {
@@ -56,7 +56,7 @@ public class BranchServiceTest {
         doNothing().when(branchValidator).validateBranchNameUnique(newName, franchiseId);
         when(branchRepository.save(any(Branch.class))).thenReturn(branch);
 
-        BranchResponseDTO response = branchService.updateBranchName(branchId, franchiseId, newName);
+        BranchDTO response = branchServiceImpl.updateBranchName(branchId, franchiseId, newName);
 
         assertEquals(branchId, response.getId());
         assertEquals(newName, response.getName());
@@ -76,7 +76,7 @@ public class BranchServiceTest {
 
         CustomException.FranchiseIdNotFoundException exception = assertThrows(
                 CustomException.FranchiseIdNotFoundException.class,
-                () -> branchService.updateBranchName(branchId, franchiseId, newName)
+                () -> branchServiceImpl.updateBranchName(branchId, franchiseId, newName)
         );
 
         assertEquals("Franchise with ID : 1 not found", exception.getMessage());
@@ -95,7 +95,7 @@ public class BranchServiceTest {
 
         CustomException.BranchIdNotFoundException exception = assertThrows(
                 CustomException.BranchIdNotFoundException.class,
-                () -> branchService.updateBranchName(branchId, franchiseId, newName)
+                () -> branchServiceImpl.updateBranchName(branchId, franchiseId, newName)
         );
 
         assertEquals("Branch with ID : 1 not found", exception.getMessage());

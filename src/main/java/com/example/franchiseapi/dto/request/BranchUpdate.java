@@ -1,4 +1,4 @@
-package com.example.franchiseapi.dto;
+package com.example.franchiseapi.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FranchiseUpdateDTO {
+public class BranchUpdate {
 
     @NotBlank(message = "New name cannot be blank")
     private String name;

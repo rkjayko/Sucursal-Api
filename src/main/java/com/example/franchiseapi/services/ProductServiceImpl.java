@@ -1,7 +1,6 @@
 package com.example.franchiseapi.services;
 
-import com.example.franchiseapi.dto.ProductRequestDTO;
-import com.example.franchiseapi.dto.ProductResponseDTO;
+import com.example.franchiseapi.dto.response.ProductDTO;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Product;
 import com.example.franchiseapi.mapper.ProductMapper;
@@ -17,7 +16,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class IProductService implements ProductServiceInterface {
+public class ProductServiceImpl implements ProductServiceInterface {
 
     private final ProductRepository productRepository;
     private final BranchRepository branchRepository;
@@ -26,8 +25,8 @@ public class IProductService implements ProductServiceInterface {
     private final BranchValidator branchValidator;
 
     @Autowired
-    public IProductService(ProductRepository productRepository, BranchRepository branchRepository,
-                           ProductMapper productMapper, ProductValidator productValidator, BranchValidator branchValidator) {
+    public ProductServiceImpl(ProductRepository productRepository, BranchRepository branchRepository,
+                              ProductMapper productMapper, ProductValidator productValidator, BranchValidator branchValidator) {
         this.productRepository = productRepository;
         this.branchRepository = branchRepository;
         this.productMapper = productMapper;
@@ -51,12 +50,12 @@ public class IProductService implements ProductServiceInterface {
     }
 
     @Override
-    public ProductResponseDTO addProductToBranch(Long branchId, ProductRequestDTO productRequestDTO) {
+    public ProductDTO addProductToBranch(Long branchId, com.example.franchiseapi.dto.request.Product productDTO) {
         return Optional.of(branchId)
                 .map(branchValidator::validateBranchExists)
                 .map(branch -> {
-                    productValidator.validateProductNameUnique(productRequestDTO.getName(), branchId);
-                    Product product = productMapper.toEntity(productRequestDTO);
+                    productValidator.validateProductNameUnique(productDTO.getName(), branchId);
+                    Product product = productMapper.toEntity(productDTO);
                     product.setBranch(branch);
                     return productRepository.save(product);
                 })
@@ -64,7 +63,7 @@ public class IProductService implements ProductServiceInterface {
                 .orElseThrow(() -> new RuntimeException("Failed to add product"));
     }
 
-    
+
     @Override
     public Product updateProductStock(Long productId, Integer newStock) {
         return Optional.of(productId)
@@ -77,7 +76,7 @@ public class IProductService implements ProductServiceInterface {
     }
 
     @Override
-    public ProductResponseDTO updateProductName(Long productId, Long branchId, String newName) {
+    public ProductDTO updateProductName(Long productId, Long branchId, String newName) {
         return Optional.of(branchId)
                 .map(branchValidator::validateBranchExists)
                 .flatMap(branch -> Optional.of(productId)
@@ -86,7 +85,7 @@ public class IProductService implements ProductServiceInterface {
                             productValidator.validateProductInBranch(branch, productId);
                             product.setName(newName);
                             Product updatedProduct = productRepository.save(product);
-                            return new ProductResponseDTO(updatedProduct.getName(), updatedProduct.getStock(), updatedProduct.getBranch().getId());
+                            return new ProductDTO(updatedProduct.getName(), updatedProduct.getStock(), updatedProduct.getBranch().getId());
                         })
                 )
                 .orElseThrow(() -> new RuntimeException("Failed to update product name"));

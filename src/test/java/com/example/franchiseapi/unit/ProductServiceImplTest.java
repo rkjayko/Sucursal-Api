@@ -1,13 +1,12 @@
 package com.example.franchiseapi.unit;
 
-import com.example.franchiseapi.dto.ProductRequestDTO;
-import com.example.franchiseapi.dto.ProductResponseDTO;
+import com.example.franchiseapi.dto.response.ProductDTO;
 import com.example.franchiseapi.entity.Branch;
 import com.example.franchiseapi.entity.Product;
 import com.example.franchiseapi.mapper.ProductMapper;
 import com.example.franchiseapi.repository.BranchRepository;
 import com.example.franchiseapi.repository.ProductRepository;
-import com.example.franchiseapi.services.IProductService;
+import com.example.franchiseapi.services.ProductServiceImpl;
 import com.example.franchiseapi.util.BranchValidator;
 import com.example.franchiseapi.util.ProductValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 
-public class IProductServiceTest {
+public class ProductServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -41,7 +40,7 @@ public class IProductServiceTest {
     private BranchValidator branchValidator;
 
     @InjectMocks
-    private IProductService productService;
+    private ProductServiceImpl productService;
 
     @BeforeEach
     public void setUp() {
@@ -74,11 +73,11 @@ public class IProductServiceTest {
     @Test
     public void testAddProductToBranch() {
         Long branchId = 1L;
-        ProductRequestDTO requestDTO = new ProductRequestDTO();
+        com.example.franchiseapi.dto.request.Product requestDTO = new com.example.franchiseapi.dto.request.Product();
         requestDTO.setName("NewProduct");
         Branch branch = new Branch();
         Product product = new Product();
-        ProductResponseDTO responseDTO = new ProductResponseDTO();
+        ProductDTO responseDTO = new ProductDTO();
 
         when(branchValidator.validateBranchExists(branchId)).thenReturn(branch);
         doNothing().when(productValidator).validateProductNameUnique(requestDTO.getName(), branchId);
@@ -86,7 +85,7 @@ public class IProductServiceTest {
         when(productRepository.save(product)).thenReturn(product);
         when(productMapper.toResponseDTO(product)).thenReturn(responseDTO);
 
-        ProductResponseDTO result = productService.addProductToBranch(branchId, requestDTO);
+        ProductDTO result = productService.addProductToBranch(branchId, requestDTO);
 
         assertEquals(responseDTO, result);
         verify(productRepository).save(product);
@@ -118,7 +117,7 @@ public class IProductServiceTest {
         Product product = new Product();
         product.setId(productId);
         product.setBranch(branch);
-        ProductResponseDTO responseDTO = new ProductResponseDTO();
+        ProductDTO responseDTO = new ProductDTO();
         responseDTO.setName(newName);
 
         when(branchValidator.validateBranchExists(branchId)).thenReturn(branch);

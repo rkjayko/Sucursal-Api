@@ -1,4 +1,4 @@
-package com.example.franchiseapi.dto;
+package com.example.franchiseapi.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Data
-public class FranchiseResponseDTO {
+public class FranchiseResponse {
 
     private Long id;
-
     private String name;
 
 }

@@ -1,11 +1,12 @@
-package com.example.franchiseapi.dto;
+package com.example.franchiseapi.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TopProductDTO {
+public class
+TopProductDTO {
 
     private String productName;
     private Integer stock;
